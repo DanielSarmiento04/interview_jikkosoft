@@ -1,6 +1,10 @@
 """Demo script for Two Sum implementation."""
 
-from src.two_sum import two_sum
+from src.two_sum import (
+    two_sum,
+    two_sum_brute_force,
+    two_sum_generator
+)
 
 
 def main() -> None:

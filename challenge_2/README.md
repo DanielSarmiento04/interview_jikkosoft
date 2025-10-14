@@ -69,8 +69,7 @@ challenge_2/
 ├── .gitignore
 ├── .python-version          # Python 3.12
 ├── pyproject.toml           # Configuración uv/pytest/mypy/ruff
-├── README.md
-└── llm.txt                  # Especificaciones del proyecto
+└── README.md
 ```
 
 ## 🛠️ Instalación y Uso
@@ -241,13 +240,3 @@ uv run pytest tests/test_performance.py --benchmark-only -v
 
 Daniel Sarmiento - Challenge 2 Interview Jikkosoft
 
----
-
-## 📝 Notas
-
-Este proyecto sigue las especificaciones de `llm.txt` y demuestra:
-- Desarrollo Python nivel senior
-- Best practices de testing
-- Optimización de algoritmos
-- Clean code principles
-- Herramientas modernas (uv, ruff, mypy, pytest)
