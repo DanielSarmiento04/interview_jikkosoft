@@ -55,7 +55,7 @@ erDiagram
         BIGSERIAL id PK
         BIGINT post_id FK
         BIGINT user_id FK
-        TEXT content
+   W     TEXT content
         TIMESTAMP created_at
     }
 

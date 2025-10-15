@@ -1,76 +1,97 @@
 # Two Sum - Challenge 2
 
-## 📝 Descripción del Problema
+**[English]** | **[Español](README_ES.md)**
 
-Implementación robusta y eficiente del algoritmo **Two Sum** en Python 3.12.
+## 📝 Problem Description
 
-**Problema:** Dada una lista de enteros y un entero objetivo, devolver los índices de dos números que sumen el valor objetivo.
+Robust and efficient implementation of the **Two Sum** algorithm in Python 3.12.
 
-- **Entrada:** `nums: list[int]`, `target: int`
-- **Salida:** `list[int]` - índices de dos números que suman el objetivo
-- **Restricción:** Cada entrada tiene exactamente una solución; no se puede usar el mismo elemento dos veces
+**Problem:** Given a list of integers and a target integer, return the indices of two numbers that sum to the target value.
 
-## 🎯 Ejemplo
+- **Input:** `nums: list[int]`, `target: int`
+- **Output:** `list[int]` - indices of two numbers that sum to the target
+- **Constraint:** Each input has exactly one solution; the same element cannot be used twice
+
+## 🎯 Example
 
 ```python
 from src.two_sum import two_sum
 
-# Caso básico
+# Basic case
 nums = [2, 7, 11, 15]
 target = 9
-print(two_sum(nums, target))  # [0, 1] porque nums[0] + nums[1] = 2 + 7 = 9
+print(two_sum(nums, target))  # [0, 1] because nums[0] + nums[1] = 2 + 7 = 9
 
-# Con números negativos
+# With negative numbers
 nums = [-1, -2, -3, -4, -5]
 target = -8
-print(two_sum(nums, target))  # [2, 4] porque -3 + (-5) = -8
+print(two_sum(nums, target))  # [2, 4] because -3 + (-5) = -8
 
-# Con duplicados
+# With duplicates
 nums = [3, 3]
 target = 6
 print(two_sum(nums, target))  # [0, 1]
 ```
 
-## 🚀 Solución Implementada
+## 🚀 Implemented Solution
 
-### Enfoque: Hash Map (Diccionario)
+### Approach: Hash Map (Dictionary)
 
-La solución utiliza un **hash map** (diccionario en Python) para lograr complejidad temporal O(n):
+The solution uses a **hash map** (dictionary in Python) to achieve O(n) time complexity:
 
-1. Iteramos sobre la lista una sola vez
-2. Para cada número, calculamos su complemento: `complement = target - num`
-3. Verificamos si el complemento ya existe en el hash map
-4. Si existe, retornamos los índices; si no, guardamos el número actual
+1. We iterate over the list only once
+2. For each number, we calculate its complement: `complement = target - num`
+3. We check if the complement already exists in the hash map
+4. If it exists, we return the indices; if not, we store the current number
 
-### Complejidad
+### Complexity
 
-- **Tiempo:** O(n) - Un solo paso por el array
-- **Espacio:** O(n) - El hash map almacena hasta n elementos
+- **Time:** O(n) - Single pass through the array
+- **Space:** O(n) - The hash map stores up to n elements
 
-### Implementaciones Alternativas
+### Alternative Implementations
 
-El proyecto incluye tres implementaciones:
+The project includes three implementations:
 
-1. **`two_sum()`** - Versión optimizada O(n) con hash map ✅ **(RECOMENDADA)**
-2. **`two_sum_brute_force()`** - Versión naive O(n²) para comparación
-3. **`two_sum_generator()`** - Versión eficiente en memoria que retorna tupla
+1. **`two_sum()`** - Optimized O(n) version with hash map ✅ **(RECOMMENDED)**
+2. **`two_sum_brute_force()`** - Naive O(n²) version for comparison
+3. **`two_sum_generator()`** - Memory-efficient version that returns a tuple
 
-## 📁 Estructura del Proyecto
+## 📁 Project Structure
 
 ```
 challenge_2/
 ├── src/
 │   ├── __init__.py
-│   └── two_sum.py           # Implementación principal
+│   └── two_sum.py           # Main implementation
 ├── tests/
 │   ├── __init__.py
-│   ├── test_two_sum.py      # Tests unitarios
-│   └── test_performance.py  # Tests de rendimiento
+│   ├── test_two_sum.py      # Unit tests
+│   └── test_performance.py  # Performance tests
 ├── .gitignore
 ├── .python-version          # Python 3.12
-├── pyproject.toml           # Configuración uv/pytest/mypy/ruff
+├── pyproject.toml           # uv/pytest/mypy/ruff configuration
 └── README.md
 ```
+
+## 🛠️ Installation and Usage
+
+### Prerequisites
+
+- Python 3.12+
+- [uv](https://github.com/astral-sh/uv) (package manager)
+
+### Installation with uv
+
+```bash
+# Install development dependencies
+uv sync --dev
+
+# Or install manually
+uv pip install pytest pytest-cov pytest-benchmark mypy ruff
+```
+
+### Basic Usage
 
 ## 🛠️ Instalación y Uso
 
@@ -89,7 +110,7 @@ uv sync --dev
 uv pip install pytest pytest-cov pytest-benchmark mypy ruff
 ```
 
-### Uso Básico
+### Basic Usage
 
 ```python
 from src.two_sum import two_sum
@@ -98,65 +119,65 @@ result = two_sum([2, 7, 11, 15], 9)
 print(result)  # [0, 1]
 ```
 
-## 🧪 Ejecutar Tests
+## 🧪 Running Tests
 
-### Tests Completos
+### Complete Tests
 
 ```bash
-# Ejecutar todos los tests con cobertura
+# Run all tests with coverage
 uv run pytest
 
-# Ver reporte de cobertura en HTML
+# View coverage report in HTML
 uv run pytest --cov=src --cov-report=html
 open htmlcov/index.html
 ```
 
-### Tests Específicos
+### Specific Tests
 
 ```bash
-# Solo tests básicos
+# Basic tests only
 uv run pytest tests/test_two_sum.py::TestTwoSumBasic -v
 
-# Solo tests de casos extremos
+# Edge case tests only
 uv run pytest tests/test_two_sum.py::TestTwoSumEdgeCases -v
 
-# Solo tests de errores
+# Error tests only
 uv run pytest tests/test_two_sum.py::TestTwoSumErrors -v
 
-# Benchmarks de rendimiento
+# Performance benchmarks
 uv run pytest tests/test_performance.py --benchmark-only
 ```
 
-### Cobertura de Tests
+### Test Coverage
 
-El proyecto tiene **95%+ de cobertura** con tests para:
+The project has **95%+ coverage** with tests for:
 
-✅ Casos básicos (números positivos, negativos, mixtos)  
-✅ Casos extremos (zeros, duplicados, arrays grandes)  
-✅ Manejo de errores (listas vacías, sin solución)  
-✅ Rendimiento (10K, 100K, 1M elementos)  
-✅ Implementaciones alternativas
+✅ Basic cases (positive, negative, mixed numbers)  
+✅ Edge cases (zeros, duplicates, large arrays)  
+✅ Error handling (empty lists, no solution)  
+✅ Performance (10K, 100K, 1M elements)  
+✅ Alternative implementations
 
 ## 🔍 Quality Assurance
 
-### Linting con Ruff
+### Linting with Ruff
 
 ```bash
-# Verificar estilo de código
+# Check code style
 uv run ruff check .
 
-# Auto-formatear código
+# Auto-format code
 uv run ruff format .
 ```
 
-### Type Checking con Mypy
+### Type Checking with Mypy
 
 ```bash
-# Verificar tipos estáticos
+# Verify static types
 uv run mypy src/ tests/
 ```
 
-### Ejecutar Todas las Verificaciones
+### Run All Checks
 
 ```bash
 # Linting
@@ -165,61 +186,61 @@ uv run ruff check .
 # Type checking
 uv run mypy src/ tests/
 
-# Tests con cobertura
+# Tests with coverage
 uv run pytest --cov=src --cov-report=term-missing
 
-# Todo en uno
+# All in one
 uv run ruff check . && uv run mypy src/ tests/ && uv run pytest
 ```
 
-## 📊 Benchmarks de Rendimiento
+## 📊 Performance Benchmarks
 
-Rendimiento esperado en hardware moderno:
+Expected performance on modern hardware:
 
-| Tamaño | Tiempo (Optimizado) | Tiempo (Brute Force) |
-|--------|---------------------|----------------------|
-| 1K     | < 1ms              | ~10ms                |
-| 10K    | < 10ms             | ~1s                  |
-| 100K   | < 100ms            | ~100s                |
-| 1M     | < 1s               | No recomendado       |
+| Size   | Time (Optimized) | Time (Brute Force) |
+|--------|------------------|--------------------|
+| 1K     | < 1ms           | ~10ms              |
+| 10K    | < 10ms          | ~1s                |
+| 100K   | < 100ms         | ~100s              |
+| 1M     | < 1s            | Not recommended    |
 
 ```bash
-# Ejecutar benchmarks
+# Run benchmarks
 uv run pytest tests/test_performance.py --benchmark-only -v
 ```
 
-## 🧩 Casos de Prueba Cubiertos
+## 🧩 Test Cases Covered
 
 ### Happy Path
-- ✅ Números positivos estándar
-- ✅ Solución al inicio del array
-- ✅ Solución al final del array
-- ✅ Solución en el medio
-- ✅ Números grandes
+- ✅ Standard positive numbers
+- ✅ Solution at the beginning of array
+- ✅ Solution at the end of array
+- ✅ Solution in the middle
+- ✅ Large numbers
 
 ### Edge Cases
-- ✅ Números negativos
-- ✅ Mix positivos/negativos
+- ✅ Negative numbers
+- ✅ Mix of positive/negative
 - ✅ Target = 0
-- ✅ Zero en el array
-- ✅ Números duplicados
-- ✅ Arrays grandes (1M+ elementos)
+- ✅ Zero in the array
+- ✅ Duplicate numbers
+- ✅ Large arrays (1M+ elements)
 
 ### Error Handling
-- ✅ Lista vacía → `ValueError`
-- ✅ Un solo elemento → `ValueError`
-- ✅ Sin solución → `ValueError`
+- ✅ Empty list → `ValueError`
+- ✅ Single element → `ValueError`
+- ✅ No solution → `ValueError`
 
-## 🏗️ Principios de Diseño
+## 🏗️ Design Principles
 
-- **SOLID Principles** - Código mantenible y extensible
-- **DRY** - No repetir código
+- **SOLID Principles** - Maintainable and extensible code
+- **DRY** - Don't repeat code
 - **Type Hints** - Python 3.12 modern type annotations
-- **Docstrings** - Documentación completa estilo Google
-- **Error Handling** - Validación robusta de inputs
-- **Testing** - 95%+ coverage con pytest
+- **Docstrings** - Complete Google-style documentation
+- **Error Handling** - Robust input validation
+- **Testing** - 95%+ coverage with pytest
 
-## 📚 Recursos y Referencias
+## 📚 Resources and References
 
 - [PEP 8 - Style Guide](https://pep8.org/)
 - [Python Type Hints](https://mypy.readthedocs.io/en/stable/cheat_sheet_py3.html)
@@ -227,16 +248,13 @@ uv run pytest tests/test_performance.py --benchmark-only -v
 - [Ruff Linter](https://docs.astral.sh/ruff/)
 - [UV Package Manager](https://github.com/astral-sh/uv)
 
-## 🔑 Conceptos Clave Demostrados
+## 🔑 Key Concepts Demonstrated
 
-1. ✅ **Algoritmos eficientes** - O(n) vs O(n²)
-2. ✅ **Estructuras de datos** - Hash maps para lookups rápidos
-3. ✅ **Type safety** - Type hints completos
-4. ✅ **Testing exhaustivo** - Unit, edge cases, performance
+1. ✅ **Efficient algorithms** - O(n) vs O(n²)
+2. ✅ **Data structures** - Hash maps for fast lookups
+3. ✅ **Type safety** - Complete type hints
+4. ✅ **Exhaustive testing** - Unit, edge cases, performance
 5. ✅ **Code quality** - Linting, formatting, type checking
-6. ✅ **Documentación** - Docstrings, README, comments
+6. ✅ **Documentation** - Docstrings, README, comments
 
-## 👨‍💻 Autor
-
-Daniel Sarmiento - Challenge 2 Interview Jikkosoft
 
