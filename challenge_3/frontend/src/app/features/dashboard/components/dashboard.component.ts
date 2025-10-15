@@ -1,4 +1,4 @@
-import { Component, inject, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, computed, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BookService } from '../../books/services/book.service';
@@ -227,10 +227,17 @@ import { MemberService } from '../../members/services/member.service';
     }
   `]
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   bookService = inject(BookService);
   libraryService = inject(LibraryService);
   memberService = inject(MemberService);
+
+  ngOnInit(): void {
+    // Load all data from the API on component initialization
+    this.bookService.loadBooks().subscribe();
+    this.libraryService.loadLibraries().subscribe();
+    this.memberService.loadMembers().subscribe();
+  }
 
   // Computed signal for availability rate
   availabilityRate = computed(() => {

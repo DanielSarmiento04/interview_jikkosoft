@@ -1,14 +1,21 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { Library } from '../models/library.model';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { Library, LibraryCreate, LibraryUpdate, LibraryListResponse } from '../models/library.model';
 
 /**
  * Service for managing library-related operations.
- * Uses signals for reactive state management.
+ * Uses signals for reactive state management and HttpClient for API calls.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class LibraryService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/libraries`;
+
   // Signal for storing all libraries
   private librariesSignal = signal<Library[]>([]);
 
@@ -18,154 +25,71 @@ export class LibraryService {
   // Computed signal for total libraries count
   totalLibraries = computed(() => this.librariesSignal().length);
 
-  constructor() {
-    // Initialize with mock data
-    this.initializeMockData();
-  }
-
   /**
-   * Initialize with mock data for demonstration
+   * Load all libraries from the API
    */
-  private initializeMockData(): void {
-    const mockLibraries: Library[] = [
-      {
-        id: 1,
-        name: 'Central Library',
-        address: '123 Main Street, City Center',
-        phone: '+1-555-0100',
-        email: 'central@library.com',
-        books: [1, 2, 3],
-        members: [1, 2],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: 2,
-        name: 'Tech Library',
-        address: '456 Tech Avenue, Innovation District',
-        phone: '+1-555-0200',
-        email: 'tech@library.com',
-        books: [1, 2],
-        members: [3],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ];
+  loadLibraries(page: number = 1, size: number = 100, search?: string): Observable<LibraryListResponse> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
 
-    this.librariesSignal.set(mockLibraries);
+    if (search) {
+      params = params.set('search', search);
+    }
+
+    return this.http.get<LibraryListResponse>(this.apiUrl, { params }).pipe(
+      tap(response => this.librariesSignal.set(response.items))
+    );
   }
 
   /**
    * Get a library by ID
    */
-  getLibraryById(id: number): Library | undefined {
-    return this.librariesSignal().find(library => library.id === id);
+  getLibraryById(id: number): Observable<Library> {
+    return this.http.get<Library>(`${this.apiUrl}/${id}`);
   }
 
   /**
-   * Add a new library
+   * Create a new library
    */
-  addLibrary(library: Omit<Library, 'id' | 'createdAt' | 'updatedAt'>): Library {
-    const newLibrary: Library = {
-      ...library,
-      id: this.generateId(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    this.librariesSignal.update(libraries => [...libraries, newLibrary]);
-    return newLibrary;
+  createLibrary(library: LibraryCreate): Observable<Library> {
+    return this.http.post<Library>(this.apiUrl, library).pipe(
+      tap(newLibrary => {
+        this.librariesSignal.update(libraries => [...libraries, newLibrary]);
+      })
+    );
   }
 
   /**
    * Update an existing library
    */
-  updateLibrary(id: number, updates: Partial<Library>): Library | undefined {
-    const index = this.librariesSignal().findIndex(library => library.id === id);
-
-    if (index === -1) return undefined;
-
-    this.librariesSignal.update(libraries => {
-      const updatedLibraries = [...libraries];
-      updatedLibraries[index] = {
-        ...updatedLibraries[index],
-        ...updates,
-        updatedAt: new Date()
-      };
-      return updatedLibraries;
-    });
-
-    return this.librariesSignal()[index];
+  updateLibrary(id: number, updates: LibraryUpdate): Observable<Library> {
+    return this.http.put<Library>(`${this.apiUrl}/${id}`, updates).pipe(
+      tap(updatedLibrary => {
+        this.librariesSignal.update(libraries =>
+          libraries.map(lib => lib.id === id ? updatedLibrary : lib)
+        );
+      })
+    );
   }
 
   /**
    * Delete a library
    */
-  deleteLibrary(id: number): boolean {
-    const initialLength = this.librariesSignal().length;
-    this.librariesSignal.update(libraries =>
-      libraries.filter(library => library.id !== id)
+  deleteLibrary(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.librariesSignal.update(libraries =>
+          libraries.filter(lib => lib.id !== id)
+        );
+      })
     );
-    return this.librariesSignal().length < initialLength;
   }
 
   /**
-   * Add a book to a library
+   * Search libraries by query
    */
-  addBookToLibrary(libraryId: number, bookId: number): Library | undefined {
-    const library = this.getLibraryById(libraryId);
-    if (!library) return undefined;
-
-    if (!library.books.includes(bookId)) {
-      const updatedBooks = [...library.books, bookId];
-      return this.updateLibrary(libraryId, { books: updatedBooks });
-    }
-
-    return library;
-  }
-
-  /**
-   * Remove a book from a library
-   */
-  removeBookFromLibrary(libraryId: number, bookId: number): Library | undefined {
-    const library = this.getLibraryById(libraryId);
-    if (!library) return undefined;
-
-    const updatedBooks = library.books.filter(id => id !== bookId);
-    return this.updateLibrary(libraryId, { books: updatedBooks });
-  }
-
-  /**
-   * Add a member to a library
-   */
-  addMemberToLibrary(libraryId: number, memberId: number): Library | undefined {
-    const library = this.getLibraryById(libraryId);
-    if (!library) return undefined;
-
-    if (!library.members.includes(memberId)) {
-      const updatedMembers = [...library.members, memberId];
-      return this.updateLibrary(libraryId, { members: updatedMembers });
-    }
-
-    return library;
-  }
-
-  /**
-   * Remove a member from a library
-   */
-  removeMemberFromLibrary(libraryId: number, memberId: number): Library | undefined {
-    const library = this.getLibraryById(libraryId);
-    if (!library) return undefined;
-
-    const updatedMembers = library.members.filter(id => id !== memberId);
-    return this.updateLibrary(libraryId, { members: updatedMembers });
-  }
-
-  /**
-   * Generate a unique ID for new libraries
-   */
-  private generateId(): number {
-    const maxId = Math.max(0, ...this.librariesSignal().map(library => library.id || 0));
-    return maxId + 1;
+  searchLibraries(query: string, page: number = 1, size: number = 100): Observable<LibraryListResponse> {
+    return this.loadLibraries(page, size, query);
   }
 }

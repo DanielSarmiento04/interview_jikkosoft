@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BookService } from '../services/book.service';
 import { Book } from '../models/book.model';
@@ -56,10 +56,10 @@ import { Book } from '../models/book.model';
                 <h3 class="book-title">{{ book.title }}</h3>
                 <span
                   class="availability-badge"
-                  [class.available]="book.availableCopies > 0"
-                  [class.unavailable]="book.availableCopies === 0"
+                  [class.available]="book.available_copies > 0"
+                  [class.unavailable]="book.available_copies === 0"
                 >
-                  {{ book.availableCopies > 0 ? 'Available' : 'Unavailable' }}
+                  {{ book.available_copies > 0 ? 'Available' : 'Unavailable' }}
                 </span>
               </div>
 
@@ -70,8 +70,8 @@ import { Book } from '../models/book.model';
                 @if (book.publisher) {
                   <p><strong>Publisher:</strong> {{ book.publisher }}</p>
                 }
-                @if (book.publicationYear) {
-                  <p><strong>Year:</strong> {{ book.publicationYear }}</p>
+                @if (book.publication_year) {
+                  <p><strong>Year:</strong> {{ book.publication_year }}</p>
                 }
                 @if (book.description) {
                   <p class="description">{{ book.description }}</p>
@@ -80,7 +80,7 @@ import { Book } from '../models/book.model';
 
               <div class="book-footer">
                 <span class="copies-info">
-                  {{ book.availableCopies }} / {{ book.totalCopies }} available
+                  {{ book.available_copies }} / {{ book.total_copies }} available
                 </span>
               </div>
             </div>
@@ -279,11 +279,16 @@ import { Book } from '../models/book.model';
     }
   `]
 })
-export class BookListComponent {
+export class BookListComponent implements OnInit {
   bookService = inject(BookService);
 
   searchQuery = signal('');
   showAvailableOnly = signal(false);
+
+  ngOnInit(): void {
+    // Load books from the API on component initialization
+    this.bookService.loadBooks().subscribe();
+  }
 
   // Computed signal for filtered books
   filteredBooks = computed(() => {
@@ -291,7 +296,7 @@ export class BookListComponent {
 
     // Filter by availability if enabled
     if (this.showAvailableOnly()) {
-      books = books.filter(book => book.availableCopies > 0);
+      books = books.filter(book => book.available_copies > 0);
     }
 
     // Filter by search query

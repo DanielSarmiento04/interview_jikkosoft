@@ -1,193 +1,127 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { Member } from '../models/member.model';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { Member, MemberCreate, MemberUpdate, MemberWithStats, MemberListResponse } from '../models/member.model';
 
 /**
  * Service for managing member-related operations.
- * Uses signals for reactive state management.
+ * Uses signals for reactive state management and HttpClient for API calls.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class MemberService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/members`;
+
   // Signal for storing all members
   private membersSignal = signal<Member[]>([]);
-  
+
   // Public readonly signal
   members = this.membersSignal.asReadonly();
-  
+
   // Computed signal for active members
-  activeMembers = computed(() => 
+  activeMembers = computed(() =>
     this.membersSignal().filter(member => member.status === 'active')
   );
-  
+
   // Computed signal for suspended members
-  suspendedMembers = computed(() => 
+  suspendedMembers = computed(() =>
     this.membersSignal().filter(member => member.status === 'suspended')
   );
-  
+
   // Computed signal for total members count
   totalMembers = computed(() => this.membersSignal().length);
 
-  constructor() {
-    // Initialize with mock data
-    this.initializeMockData();
+  /**
+   * Load all members from the API
+   */
+  loadMembers(params?: {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    status_filter?: string;
+  }): Observable<MemberListResponse> {
+    let httpParams = new HttpParams();
+
+    if (params?.page) httpParams = httpParams.set('page', params.page.toString());
+    if (params?.page_size) httpParams = httpParams.set('page_size', params.page_size.toString());
+    if (params?.search) httpParams = httpParams.set('search', params.search);
+    if (params?.status_filter) httpParams = httpParams.set('status_filter', params.status_filter);
+
+    return this.http.get<MemberListResponse>(`${this.apiUrl}/`, { params: httpParams }).pipe(
+      tap(response => this.membersSignal.set(response.items))
+    );
   }
 
   /**
-   * Initialize with mock data for demonstration
+   * Get a member by ID with statistics
    */
-  private initializeMockData(): void {
-    const mockMembers: Member[] = [
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+1-555-1000',
-        address: '789 Reader Lane, Bookville',
-        membershipDate: new Date('2024-01-15'),
-        membershipExpiry: new Date('2025-01-15'),
-        status: 'active',
-        maxLoans: 5,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: 2,
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        phone: '+1-555-2000',
-        address: '321 Scholar Street, Readington',
-        membershipDate: new Date('2024-03-20'),
-        membershipExpiry: new Date('2025-03-20'),
-        status: 'active',
-        maxLoans: 3,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        id: 3,
-        name: 'Bob Johnson',
-        email: 'bob.johnson@example.com',
-        phone: '+1-555-3000',
-        address: '654 Library Road, Pageville',
-        membershipDate: new Date('2023-12-01'),
-        membershipExpiry: new Date('2024-12-01'),
-        status: 'expired',
-        maxLoans: 5,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ];
-    
-    this.membersSignal.set(mockMembers);
+  getMemberById(id: number): Observable<MemberWithStats> {
+    return this.http.get<MemberWithStats>(`${this.apiUrl}/${id}`);
   }
 
   /**
-   * Get a member by ID
+   * Create a new member
    */
-  getMemberById(id: number): Member | undefined {
-    return this.membersSignal().find(member => member.id === id);
-  }
-
-  /**
-   * Get a member by email
-   */
-  getMemberByEmail(email: string): Member | undefined {
-    return this.membersSignal().find(member => member.email === email);
-  }
-
-  /**
-   * Add a new member
-   */
-  addMember(member: Omit<Member, 'id' | 'createdAt' | 'updatedAt'>): Member {
-    const newMember: Member = {
-      ...member,
-      id: this.generateId(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    this.membersSignal.update(members => [...members, newMember]);
-    return newMember;
+  createMember(member: MemberCreate): Observable<Member> {
+    return this.http.post<Member>(`${this.apiUrl}/`, member).pipe(
+      tap(newMember => this.membersSignal.update(members => [...members, newMember]))
+    );
   }
 
   /**
    * Update an existing member
    */
-  updateMember(id: number, updates: Partial<Member>): Member | undefined {
-    const index = this.membersSignal().findIndex(member => member.id === id);
-    
-    if (index === -1) return undefined;
-    
-    this.membersSignal.update(members => {
-      const updatedMembers = [...members];
-      updatedMembers[index] = {
-        ...updatedMembers[index],
-        ...updates,
-        updatedAt: new Date()
-      };
-      return updatedMembers;
-    });
-    
-    return this.membersSignal()[index];
+  updateMember(id: number, updates: MemberUpdate): Observable<Member> {
+    return this.http.put<Member>(`${this.apiUrl}/${id}`, updates).pipe(
+      tap(updatedMember => {
+        this.membersSignal.update(members =>
+          members.map(member => member.id === id ? updatedMember : member)
+        );
+      })
+    );
   }
 
   /**
    * Delete a member
    */
-  deleteMember(id: number): boolean {
-    const initialLength = this.membersSignal().length;
-    this.membersSignal.update(members => members.filter(member => member.id !== id));
-    return this.membersSignal().length < initialLength;
-  }
-
-  /**
-   * Update member status
-   */
-  updateMemberStatus(id: number, status: 'active' | 'suspended' | 'expired'): Member | undefined {
-    return this.updateMember(id, { status });
+  deleteMember(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this.membersSignal.update(members => members.filter(member => member.id !== id));
+      })
+    );
   }
 
   /**
    * Suspend a member
    */
-  suspendMember(id: number): Member | undefined {
-    return this.updateMemberStatus(id, 'suspended');
+  suspendMember(id: number): Observable<Member> {
+    return this.http.post<Member>(`${this.apiUrl}/${id}/suspend`, {});
   }
 
   /**
    * Activate a member
    */
-  activateMember(id: number): Member | undefined {
-    return this.updateMemberStatus(id, 'active');
+  activateMember(id: number): Observable<Member> {
+    return this.http.post<Member>(`${this.apiUrl}/${id}/activate`, {});
   }
 
   /**
    * Renew membership
    */
-  renewMembership(id: number, expiryDate: Date): Member | undefined {
-    return this.updateMember(id, { 
-      membershipExpiry: expiryDate,
-      status: 'active'
-    });
+  renewMembership(id: number, months = 12): Observable<Member> {
+    const params = new HttpParams().set('months', months.toString());
+    return this.http.post<Member>(`${this.apiUrl}/${id}/renew`, {}, { params });
   }
 
   /**
-   * Search members by name or email
+   * Search members (uses the load members with search parameter)
    */
-  searchMembers(query: string): Member[] {
-    const lowerQuery = query.toLowerCase();
-    return this.membersSignal().filter(member =>
-      member.name.toLowerCase().includes(lowerQuery) ||
-      member.email.toLowerCase().includes(lowerQuery)
-    );
-  }
-
-  /**
-   * Generate a unique ID for new members
-   */
-  private generateId(): number {
-    const maxId = Math.max(0, ...this.membersSignal().map(member => member.id || 0));
-    return maxId + 1;
+  searchMembers(query: string): Observable<MemberListResponse> {
+    return this.loadMembers({ search: query, page_size: 100 });
   }
 }

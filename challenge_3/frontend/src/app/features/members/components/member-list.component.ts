@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MemberService } from '../services/member.service';
 import { Member } from '../models/member.model';
@@ -98,18 +98,22 @@ import { Member } from '../models/member.model';
 
               <div class="member-info">
                 <div class="info-item">
-                  <span class="info-label">Membership Date</span>
-                  <span class="info-value">{{ member.membershipDate | date:'mediumDate' }}</span>
+                  <span class="info-label">Member Number</span>
+                  <span class="info-value">{{ member.member_number }}</span>
                 </div>
-                @if (member.membershipExpiry) {
+                <div class="info-item">
+                  <span class="info-label">Membership Date</span>
+                  <span class="info-value">{{ member.membership_date | date:'mediumDate' }}</span>
+                </div>
+                @if (member.membership_expiry) {
                   <div class="info-item">
                     <span class="info-label">Expiry Date</span>
-                    <span class="info-value">{{ member.membershipExpiry | date:'mediumDate' }}</span>
+                    <span class="info-value">{{ member.membership_expiry | date:'mediumDate' }}</span>
                   </div>
                 }
                 <div class="info-item">
                   <span class="info-label">Max Loans</span>
-                  <span class="info-value">{{ member.maxLoans }}</span>
+                  <span class="info-value">{{ member.max_loans }}</span>
                 </div>
               </div>
             </div>
@@ -319,11 +323,16 @@ import { Member } from '../models/member.model';
     }
   `]
 })
-export class MemberListComponent {
+export class MemberListComponent implements OnInit {
   memberService = inject(MemberService);
 
   searchQuery = signal('');
   statusFilter = signal<'all' | 'active' | 'suspended' | 'expired'>('all');
+
+  ngOnInit(): void {
+    // Load members from the API on component initialization
+    this.memberService.loadMembers().subscribe();
+  }
 
   // Computed signal for filtered members
   filteredMembers = computed(() => {

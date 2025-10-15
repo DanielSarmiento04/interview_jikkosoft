@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LibraryService } from '../services/library.service';
 import { Library } from '../models/library.model';
@@ -35,37 +35,26 @@ import { Library } from '../models/library.model';
               <div class="library-header">
                 <h3 class="library-name">{{ library.name }}</h3>
               </div>
-              
+
               <div class="library-details">
                 <div class="detail-item">
                   <span class="icon">📍</span>
                   <span>{{ library.address }}</span>
                 </div>
-                
+
                 @if (library.phone) {
                   <div class="detail-item">
                     <span class="icon">📞</span>
                     <span>{{ library.phone }}</span>
                   </div>
                 }
-                
+
                 @if (library.email) {
                   <div class="detail-item">
                     <span class="icon">✉️</span>
                     <span>{{ library.email }}</span>
                   </div>
                 }
-              </div>
-
-              <div class="library-stats">
-                <div class="stat-item">
-                  <span class="stat-number">{{ library.books.length }}</span>
-                  <span class="stat-text">Books</span>
-                </div>
-                <div class="stat-item">
-                  <span class="stat-number">{{ library.members.length }}</span>
-                  <span class="stat-text">Members</span>
-                </div>
               </div>
             </div>
           }
@@ -212,6 +201,11 @@ import { Library } from '../models/library.model';
     }
   `]
 })
-export class LibraryListComponent {
+export class LibraryListComponent implements OnInit {
   libraryService = inject(LibraryService);
+
+  ngOnInit(): void {
+    // Load libraries from the API on component initialization
+    this.libraryService.loadLibraries().subscribe();
+  }
 }
