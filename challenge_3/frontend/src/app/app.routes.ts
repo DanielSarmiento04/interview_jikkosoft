@@ -21,17 +21,17 @@ export const routes: Routes = [
       )
   },
   {
-    path: 'libraries',
-    loadComponent: () =>
-      import('./features/libraries/components/library-list.component').then(
-        m => m.LibraryListComponent
-      )
-  },
-  {
     path: 'members',
     loadComponent: () =>
       import('./features/members/components/member-list.component').then(
         m => m.MemberListComponent
+      )
+  },
+  {
+    path: 'loans',
+    loadComponent: () =>
+      import('./features/loans/components/loan-list.component').then(
+        m => m.LoanListComponent
       )
   },
   {

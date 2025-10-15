@@ -2,8 +2,8 @@ import { Component, inject, computed, ChangeDetectionStrategy, OnInit } from '@a
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { BookService } from '../../books/services/book.service';
-import { LibraryService } from '../../libraries/services/library.service';
 import { MemberService } from '../../members/services/member.service';
+import { LoanService } from '../../loans/services/loan.service';
 
 /**
  * Dashboard component showing overview statistics.
@@ -31,16 +31,6 @@ import { MemberService } from '../../members/services/member.service';
           <a routerLink="/books" class="stat-link">View Books →</a>
         </div>
 
-        <div class="stat-card libraries">
-          <div class="stat-icon">🏛️</div>
-          <div class="stat-content">
-            <h3>Libraries</h3>
-            <p class="stat-number">{{ libraryService.totalLibraries() }}</p>
-            <p class="stat-detail">Active locations</p>
-          </div>
-          <a routerLink="/libraries" class="stat-link">View Libraries →</a>
-        </div>
-
         <div class="stat-card members">
           <div class="stat-icon">👥</div>
           <div class="stat-content">
@@ -51,13 +41,24 @@ import { MemberService } from '../../members/services/member.service';
           <a routerLink="/members" class="stat-link">View Members →</a>
         </div>
 
-        <div class="stat-card availability">
-          <div class="stat-icon">✓</div>
+        <div class="stat-card loans">
+          <div class="stat-icon">�</div>
           <div class="stat-content">
-            <h3>Availability Rate</h3>
-            <p class="stat-number">{{ availabilityRate() }}%</p>
-            <p class="stat-detail">Books available now</p>
+            <h3>Active Loans</h3>
+            <p class="stat-number">{{ loanService.activeLoans() }}</p>
+            <p class="stat-detail">{{ loanService.totalLoans() }} total loans</p>
           </div>
+          <a routerLink="/loans" class="stat-link">View Loans →</a>
+        </div>
+
+        <div class="stat-card overdue">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-content">
+            <h3>Overdue Loans</h3>
+            <p class="stat-number">{{ loanService.overdueLoans() }}</p>
+            <p class="stat-detail">Need immediate attention</p>
+          </div>
+          <a routerLink="/loans" class="stat-link">Manage Overdue →</a>
         </div>
       </div>
 
@@ -68,13 +69,13 @@ import { MemberService } from '../../members/services/member.service';
             <span class="action-icon">📖</span>
             <span class="action-text">Browse Books</span>
           </a>
-          <a routerLink="/libraries" class="action-card">
-            <span class="action-icon">🏛️</span>
-            <span class="action-text">View Libraries</span>
-          </a>
           <a routerLink="/members" class="action-card">
             <span class="action-icon">👤</span>
             <span class="action-text">Manage Members</span>
+          </a>
+          <a routerLink="/loans" class="action-card">
+            <span class="action-icon">�</span>
+            <span class="action-text">Track Loans</span>
           </a>
         </div>
       </div>
@@ -131,16 +132,16 @@ import { MemberService } from '../../members/services/member.service';
       border-top: 4px solid #4a90e2;
     }
 
-    .stat-card.libraries {
-      border-top: 4px solid #50c878;
-    }
-
     .stat-card.members {
       border-top: 4px solid #f39c12;
     }
 
-    .stat-card.availability {
-      border-top: 4px solid #9b59b6;
+    .stat-card.loans {
+      border-top: 4px solid #50c878;
+    }
+
+    .stat-card.overdue {
+      border-top: 4px solid #e74c3c;
     }
 
     .stat-icon {
@@ -229,14 +230,15 @@ import { MemberService } from '../../members/services/member.service';
 })
 export class DashboardComponent implements OnInit {
   bookService = inject(BookService);
-  libraryService = inject(LibraryService);
   memberService = inject(MemberService);
+  loanService = inject(LoanService);
 
   ngOnInit(): void {
     // Load all data from the API on component initialization
     this.bookService.loadBooks().subscribe();
-    this.libraryService.loadLibraries().subscribe();
     this.memberService.loadMembers().subscribe();
+    this.loanService.loadLoans().subscribe();
+    this.loanService.loadStatistics().subscribe();
   }
 
   // Computed signal for availability rate
