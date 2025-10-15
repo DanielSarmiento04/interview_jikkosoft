@@ -16,6 +16,7 @@ from functools import lru_cache
 
 from pydantic import Field, field_validator, AnyHttpUrl, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import os
 
 
 class Settings(BaseSettings):
@@ -38,7 +39,7 @@ class Settings(BaseSettings):
     
     # Application settings
 
-    database_url: 
+    database_url: PostgresDsn
 
 
 @lru_cache()
@@ -50,7 +51,15 @@ def get_settings() -> Settings:
     and reuse it throughout the application lifecycle. This is both
     more efficient and ensures consistency.
     """
-    return Settings()
+
+    database_url = os.getenv("PG_CONNECTION_STRING", None)
+    if not database_url:
+        raise ValueError("PG_CONNECTION_STRING environment variable is not set")
+
+
+    return Settings(
+        database_url=PostgresDsn(database_url)
+    )
 
 
 # Global settings instance for easy importing

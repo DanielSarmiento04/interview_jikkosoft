@@ -2,3 +2,4 @@
 llm.txt
 node_modules/
 *.pyc
+__pycache__/
