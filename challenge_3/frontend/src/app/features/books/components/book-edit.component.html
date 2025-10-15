@@ -1,0 +1,168 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>📝 Edit Book</h2>
+    <p>Update book information</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <span>Loading book data...</span>
+    </div>
+  } @else if (bookForm) {
+    <form [formGroup]="bookForm" (ngSubmit)="onSubmit()" class="book-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="isbn">ISBN (Read Only)</label>
+          <input
+            id="isbn"
+            type="text"
+            formControlName="isbn"
+            placeholder="978-3-16-148410-0"
+            readonly
+          />
+          <small class="field-note">ISBN cannot be changed after creation</small>
+        </div>
+
+        <div class="form-group">
+          <label for="title">Title *</label>
+          <input
+            id="title"
+            type="text"
+            formControlName="title"
+            placeholder="Enter book title"
+            [class.error]="bookForm.get('title')?.invalid && bookForm.get('title')?.touched"
+          />
+          @if (bookForm.get('title')?.invalid && bookForm.get('title')?.touched) {
+            <span class="error-message">Title is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="author">Author *</label>
+          <input
+            id="author"
+            type="text"
+            formControlName="author"
+            placeholder="Enter author name"
+            [class.error]="bookForm.get('author')?.invalid && bookForm.get('author')?.touched"
+          />
+          @if (bookForm.get('author')?.invalid && bookForm.get('author')?.touched) {
+            <span class="error-message">Author is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="publisher">Publisher</label>
+          <input
+            id="publisher"
+            type="text"
+            formControlName="publisher"
+            placeholder="Enter publisher name"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="publication_year">Publication Year</label>
+          <input
+            id="publication_year"
+            type="number"
+            formControlName="publication_year"
+            placeholder="2024"
+            min="1000"
+            max="2100"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <input
+            id="category"
+            type="text"
+            formControlName="category"
+            placeholder="e.g., Fiction, Science, History"
+            [class.error]="bookForm.get('category')?.invalid && bookForm.get('category')?.touched"
+          />
+          @if (bookForm.get('category')?.invalid && bookForm.get('category')?.touched) {
+            <span class="error-message">Category is required</span>
+          }
+        </div>
+
+        <div class="form-group full-width">
+          <label for="description">Description</label>
+          <textarea
+            id="description"
+            formControlName="description"
+            rows="4"
+            placeholder="Enter book description..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="total_copies">Total Copies *</label>
+          <input
+            id="total_copies"
+            type="number"
+            formControlName="total_copies"
+            placeholder="0"
+            min="1"
+            [class.error]="bookForm.get('total_copies')?.invalid && bookForm.get('total_copies')?.touched"
+          />
+          @if (bookForm.get('total_copies')?.invalid && bookForm.get('total_copies')?.touched) {
+            <span class="error-message">At least 1 copy is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="available_copies">Available Copies *</label>
+          <input
+            id="available_copies"
+            type="number"
+            formControlName="available_copies"
+            placeholder="0"
+            min="0"
+            [class.error]="bookForm.get('available_copies')?.invalid && bookForm.get('available_copies')?.touched"
+          />
+          @if (bookForm.get('available_copies')?.invalid && bookForm.get('available_copies')?.touched) {
+            <span class="error-message">Available copies is required</span>
+          }
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span class="alert-icon">⚠️</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <span class="alert-icon">✓</span>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-danger" (click)="onDelete()" [disabled]="submitting()">
+          <span>🗑️</span>
+          <span>Delete Book</span>
+        </button>
+        <div class="actions-right">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="bookForm.invalid || submitting()">
+            @if (submitting()) {
+              <span class="spinner"></span>
+              <span>Saving...</span>
+            } @else {
+              <span>✓</span>
+              <span>Save Changes</span>
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+</div>

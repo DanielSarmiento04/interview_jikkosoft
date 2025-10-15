@@ -1,0 +1,105 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>👤 Add New Member</h2>
+    <p>Register a new library member</p>
+  </div>
+
+  <form [formGroup]="memberForm" (ngSubmit)="onSubmit()" class="member-form">
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label for="name">Full Name *</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          placeholder="Enter member's full name"
+          [class.error]="memberForm.get('name')?.invalid && memberForm.get('name')?.touched"
+        />
+        @if (memberForm.get('name')?.invalid && memberForm.get('name')?.touched) {
+          <span class="error-message">Name is required</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address *</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="member@example.com"
+          [class.error]="memberForm.get('email')?.invalid && memberForm.get('email')?.touched"
+        />
+        @if (memberForm.get('email')?.invalid && memberForm.get('email')?.touched) {
+          @if (memberForm.get('email')?.hasError('required')) {
+            <span class="error-message">Email is required</span>
+          }
+          @if (memberForm.get('email')?.hasError('email')) {
+            <span class="error-message">Please enter a valid email</span>
+          }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input
+          id="phone"
+          type="tel"
+          formControlName="phone"
+          placeholder="+1 (555) 123-4567"
+        />
+      </div>
+
+      <div class="form-group full-width">
+        <label for="address">Address</label>
+        <textarea
+          id="address"
+          formControlName="address"
+          rows="3"
+          placeholder="Enter member's address..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="max_loans">Maximum Loans Allowed</label>
+        <input
+          id="max_loans"
+          type="number"
+          formControlName="max_loans"
+          placeholder="5"
+          min="1"
+          max="20"
+        />
+        <small class="help-text">Number of books this member can borrow at once (default: 5)</small>
+      </div>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        <span class="alert-icon">✓</span>
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="memberForm.invalid || loading()">
+        @if (loading()) {
+          <span class="spinner"></span>
+          <span>Creating...</span>
+        } @else {
+          <span>✓</span>
+          <span>Create Member</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

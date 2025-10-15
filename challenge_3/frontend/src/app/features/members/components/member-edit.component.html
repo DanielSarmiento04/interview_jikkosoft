@@ -1,0 +1,132 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>👤 Edit Member</h2>
+    <p>Update member information</p>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <span>Loading member data...</span>
+    </div>
+  } @else if (memberForm) {
+    <form [formGroup]="memberForm" (ngSubmit)="onSubmit()" class="member-form">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="name">Full Name *</label>
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Enter member's full name"
+            [class.error]="memberForm.get('name')?.invalid && memberForm.get('name')?.touched"
+          />
+          @if (memberForm.get('name')?.invalid && memberForm.get('name')?.touched) {
+            <span class="error-message">Name is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="member@example.com"
+            [class.error]="memberForm.get('email')?.invalid && memberForm.get('email')?.touched"
+          />
+          @if (memberForm.get('email')?.invalid && memberForm.get('email')?.touched) {
+            <span class="error-message">Valid email is required</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input
+            id="phone"
+            type="tel"
+            formControlName="phone"
+            placeholder="+1 234 567 8900"
+          />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="address">Address</label>
+          <textarea
+            id="address"
+            formControlName="address"
+            rows="3"
+            placeholder="Enter member's address..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="max_loans">Max Loans Allowed *</label>
+          <input
+            id="max_loans"
+            type="number"
+            formControlName="max_loans"
+            placeholder="5"
+            min="1"
+            max="20"
+            [class.error]="memberForm.get('max_loans')?.invalid && memberForm.get('max_loans')?.touched"
+          />
+          @if (memberForm.get('max_loans')?.invalid && memberForm.get('max_loans')?.touched) {
+            <span class="error-message">Max loans must be between 1 and 20</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="status">Status *</label>
+          <select
+            id="status"
+            formControlName="status"
+            [class.error]="memberForm.get('status')?.invalid && memberForm.get('status')?.touched"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+            <option value="suspended">Suspended</option>
+          </select>
+          @if (memberForm.get('status')?.invalid && memberForm.get('status')?.touched) {
+            <span class="error-message">Status is required</span>
+          }
+        </div>
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-error">
+          <span class="alert-icon">⚠️</span>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      @if (successMessage()) {
+        <div class="alert alert-success">
+          <span class="alert-icon">✓</span>
+          <span>{{ successMessage() }}</span>
+        </div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-danger" (click)="onDelete()" [disabled]="submitting()">
+          <span>🗑️</span>
+          <span>Delete Member</span>
+        </button>
+        <div class="actions-right">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="memberForm.invalid || submitting()">
+            @if (submitting()) {
+              <span class="spinner"></span>
+              <span>Saving...</span>
+            } @else {
+              <span>✓</span>
+              <span>Save Changes</span>
+            }
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+</div>

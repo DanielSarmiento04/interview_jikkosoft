@@ -1,0 +1,164 @@
+<div class="loan-list-container">
+  <div class="header">
+    <div class="title-section">
+      <span class="icon">📚</span>
+      <div>
+        <h2>Loan Management</h2>
+        <p class="subtitle">Track and manage all book loans in your library</p>
+      </div>
+      <button (click)="checkoutNewBook()" class="btn-checkout">
+        <span>📖</span> Checkout Book
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card total">
+      <div class="stat-icon">📊</div>
+      <div class="stat-content">
+        <h3>{{ loanService.totalLoans() }}</h3>
+        <p>Total Loans</p>
+      </div>
+    </div>
+    <div class="stat-card active">
+      <div class="stat-icon">📖</div>
+      <div class="stat-content">
+        <h3>{{ loanService.activeLoans() }}</h3>
+        <p>Active Loans</p>
+      </div>
+    </div>
+    <div class="stat-card overdue">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <h3>{{ loanService.overdueLoans() }}</h3>
+        <p>Overdue Loans</p>
+      </div>
+    </div>
+    @if (loanService.statistics(); as stats) {
+      <div class="stat-card completed">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ stats.completed_loans }}</h3>
+          <p>Completed</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="loans-section">
+    <div class="section-header">
+      <h3>📋 All Loans</h3>
+      <div class="filters">
+        <button class="filter-btn active">All</button>
+        <button class="filter-btn">Active</button>
+        <button class="filter-btn">Overdue</button>
+        <button class="filter-btn">Returned</button>
+      </div>
+    </div>
+
+    @if (loanService.loans().length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">📚</div>
+        <h3>No loans found</h3>
+        <p>Start by checking out a book to your members!</p>
+      </div>
+    } @else {
+      <div class="loans-grid">
+        @for (loan of loanService.loans(); track loan.id) {
+          <div class="loan-card" [class.overdue]="loan.is_overdue" [class.returned]="loan.return_date">
+            <div class="loan-header">
+              <div class="book-info">
+                <span class="book-icon">📖</span>
+                <h4>{{ loan.book_title || 'Book #' + loan.book_id }}</h4>
+              </div>
+              @if (loan.return_date) {
+                <span class="badge returned">✓ Returned</span>
+              } @else if (loan.is_overdue) {
+                <span class="badge overdue">⚠ Overdue</span>
+              } @else {
+                <span class="badge active">● Active</span>
+              }
+            </div>
+
+            <div class="loan-meta">
+              <div class="meta-item">
+                <span class="meta-icon">👤</span>
+                <div>
+                  <small>Member</small>
+                  <p>{{ loan.member_name || loan.member_number || 'ID: ' + loan.member_id }}</p>
+                </div>
+              </div>
+              <div class="meta-item">
+                <span class="meta-icon">✍️</span>
+                <div>
+                  <small>Author</small>
+                  <p>{{ loan.book_author || 'N/A' }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="loan-timeline">
+              <div class="timeline-item">
+                <span class="timeline-icon checkout">📤</span>
+                <div>
+                  <small>Checkout</small>
+                  <p>{{ loan.checkout_date | date:'MMM d, y' }}</p>
+                </div>
+              </div>
+              <div class="timeline-divider"></div>
+              <div class="timeline-item">
+                <span class="timeline-icon due" [class.overdue]="loan.is_overdue">📅</span>
+                <div>
+                  <small>Due Date</small>
+                  <p [class.text-danger]="loan.is_overdue">{{ loan.due_date | date:'MMM d, y' }}</p>
+                </div>
+              </div>
+              @if (loan.return_date) {
+                <div class="timeline-divider"></div>
+                <div class="timeline-item">
+                  <span class="timeline-icon returned">📥</span>
+                  <div>
+                    <small>Returned</small>
+                    <p>{{ loan.return_date | date:'MMM d, y' }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+
+            @if (loan.is_overdue && !loan.return_date) {
+              <div class="overdue-alert">
+                <span class="alert-icon">⚠️</span>
+                <span><strong>{{ loan.days_overdue }}</strong> {{ loan.days_overdue === 1 ? 'day' : 'days' }} overdue</span>
+              </div>
+            }
+
+            <div class="loan-footer">
+              <div class="renewal-info">
+                <span class="renewal-icon">🔄</span>
+                <span>Renewed {{ loan.renewal_count }}/2</span>
+                @if (loan.renewal_count >= 2) {
+                  <span class="max-renewals">⚠️ Max renewals reached</span>
+                }
+              </div>
+              @if (!loan.return_date) {
+                <div class="loan-actions">
+                  <button
+                    class="btn btn-secondary"
+                    (click)="renewLoan(loan.id, loan.renewal_count)"
+                    [disabled]="loan.renewal_count >= 2"
+                    [title]="loan.renewal_count >= 2 ? 'Maximum renewals (2) reached' : 'Renew loan'"
+                  >
+                    <span>🔄</span> Renew
+                  </button>
+                  <button class="btn btn-primary" (click)="returnBook(loan.id)" title="Return book">
+                    <span>✓</span> Return
+                  </button>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

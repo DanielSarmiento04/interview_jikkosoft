@@ -1,0 +1,115 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>📖 Checkout Book</h2>
+    <p>Create a new loan by assigning a book to a member</p>
+  </div>
+
+  <form [formGroup]="loanForm" (ngSubmit)="onSubmit()" class="loan-form">
+    <div class="form-grid">
+      <div class="form-group full-width">
+        <label for="book_id">Select Book *</label>
+        <select
+          id="book_id"
+          formControlName="book_id"
+          [class.error]="loanForm.get('book_id')?.invalid && loanForm.get('book_id')?.touched"
+        >
+          <option value="">-- Choose a book --</option>
+          @for (book of availableBooks(); track book.id) {
+            <option [value]="book.id">
+              {{ book.title }} by {{ book.author }} ({{ book.available_copies }} available)
+            </option>
+          }
+        </select>
+        @if (loanForm.get('book_id')?.invalid && loanForm.get('book_id')?.touched) {
+          <span class="error-message">Please select a book</span>
+        }
+        @if (!loadingBooks() && availableBooks().length === 0) {
+          <span class="info-message">No books available for checkout</span>
+        }
+      </div>
+
+      <div class="form-group full-width">
+        <label for="member_id">Select Member *</label>
+        <select
+          id="member_id"
+          formControlName="member_id"
+          [class.error]="loanForm.get('member_id')?.invalid && loanForm.get('member_id')?.touched"
+        >
+          <option value="">-- Choose a member --</option>
+          @for (member of activeMembers(); track member.id) {
+            <option [value]="member.id">
+              {{ member.name }} ({{ member.email }}) - {{ member.status }}
+            </option>
+          }
+        </select>
+        @if (loanForm.get('member_id')?.invalid && loanForm.get('member_id')?.touched) {
+          <span class="error-message">Please select a member</span>
+        }
+        @if (!loadingMembers() && activeMembers().length === 0) {
+          <span class="info-message">No active members available</span>
+        }
+      </div>
+
+      <div class="form-group full-width">
+        <label for="due_date">Due Date (Optional)</label>
+        <input
+          id="due_date"
+          type="date"
+          formControlName="due_date"
+          [min]="minDate"
+        />
+        <small class="help-text">Leave blank to use default (14 days from checkout)</small>
+      </div>
+    </div>
+
+    @if (loadingBooks() || loadingMembers()) {
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <span>Loading data...</span>
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <div class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    @if (successMessage()) {
+      <div class="alert alert-success">
+        <span class="alert-icon">✓</span>
+        <span>{{ successMessage() }}</span>
+      </div>
+    }
+
+    <div class="info-box">
+      <h4>📋 Checkout Information</h4>
+      <ul>
+        <li>Default loan period is 14 days</li>
+        <li>Books can be renewed up to 2 times</li>
+        <li>Late returns may incur fines</li>
+        <li>Members can borrow up to their maximum loan limit</li>
+      </ul>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        Cancel
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="loanForm.invalid || loading() || loadingBooks() || loadingMembers()"
+      >
+        @if (loading()) {
+          <span class="spinner"></span>
+          <span>Processing...</span>
+        } @else {
+          <span>✓</span>
+          <span>Checkout Book</span>
+        }
+      </button>
+    </div>
+  </form>
+</div>

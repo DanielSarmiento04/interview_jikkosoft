@@ -1,0 +1,66 @@
+<div class="dashboard-container">
+  <header class="page-header">
+    <h1>Library Management Dashboard</h1>
+    <p class="subtitle">Welcome to your library management system</p>
+  </header>
+
+  <div class="stats-grid">
+    <div class="stat-card books">
+      <div class="stat-icon">📚</div>
+      <div class="stat-content">
+        <h3>Total Books</h3>
+        <p class="stat-number">{{ bookService.totalBooks() }}</p>
+        <p class="stat-detail">{{ bookService.availableBooks().length }} available</p>
+      </div>
+      <a routerLink="/books" class="stat-link">View Books →</a>
+    </div>
+
+    <div class="stat-card members">
+      <div class="stat-icon">👥</div>
+      <div class="stat-content">
+        <h3>Members</h3>
+        <p class="stat-number">{{ memberService.totalMembers() }}</p>
+        <p class="stat-detail">{{ memberService.activeMembers().length }} active</p>
+      </div>
+      <a routerLink="/members" class="stat-link">View Members →</a>
+    </div>
+
+    <div class="stat-card loans">
+      <div class="stat-icon">📖</div>
+      <div class="stat-content">
+        <h3>Active Loans</h3>
+        <p class="stat-number">{{ loanService.activeLoans() }}</p>
+        <p class="stat-detail">{{ loanService.totalLoans() }} total loans</p>
+      </div>
+      <a routerLink="/loans" class="stat-link">View Loans →</a>
+    </div>
+
+    <div class="stat-card overdue">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-content">
+        <h3>Overdue Loans</h3>
+        <p class="stat-number">{{ loanService.overdueLoans() }}</p>
+        <p class="stat-detail">Need immediate attention</p>
+      </div>
+      <a routerLink="/loans" class="stat-link">Manage Overdue →</a>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <h2>Quick Actions</h2>
+    <div class="actions-grid">
+      <a routerLink="/books" class="action-card">
+        <span class="action-icon">📖</span>
+        <span class="action-text">Browse Books</span>
+      </a>
+      <a routerLink="/members" class="action-card">
+        <span class="action-icon">👤</span>
+        <span class="action-text">Manage Members</span>
+      </a>
+      <a routerLink="/loans" class="action-card">
+        <span class="action-icon">📖</span>
+        <span class="action-text">Track Loans</span>
+      </a>
+    </div>
+  </div>
+</div>

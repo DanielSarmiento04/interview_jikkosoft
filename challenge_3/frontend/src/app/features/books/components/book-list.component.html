@@ -1,0 +1,84 @@
+<div class="book-list-container">
+  <header class="page-header">
+    <div class="header-title">
+      <h1>Book Catalog</h1>
+      <button (click)="addNewBook()" class="btn-add">
+        <span>+</span> Add New Book
+      </button>
+    </div>
+    <div class="header-actions">
+      <input
+        type="text"
+        placeholder="Search books..."
+        [value]="searchQuery()"
+        (input)="onSearchChange($event)"
+        class="search-input"
+      />
+      <button (click)="toggleShowAvailableOnly()" class="filter-btn">
+        {{ showAvailableOnly() ? 'Show All' : 'Show Available Only' }}
+      </button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat-card">
+      <span class="stat-label">Total Books</span>
+      <span class="stat-value">{{ bookService.totalBooks() }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Available</span>
+      <span class="stat-value">{{ bookService.availableBooks().length }}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-label">Filtered Results</span>
+      <span class="stat-value">{{ filteredBooks().length }}</span>
+    </div>
+  </div>
+
+  @if (filteredBooks().length === 0) {
+    <div class="empty-state">
+      <p>No books found matching your criteria.</p>
+    </div>
+  } @else {
+    <div class="books-grid">
+      @for (book of filteredBooks(); track book.id) {
+        <div class="book-card">
+          <div class="book-header">
+            <h3 class="book-title">{{ book.title }}</h3>
+            <span
+              class="availability-badge"
+              [class.available]="book.available_copies > 0"
+              [class.unavailable]="book.available_copies === 0"
+            >
+              {{ book.available_copies > 0 ? 'Available' : 'Unavailable' }}
+            </span>
+          </div>
+
+          <div class="book-details">
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+            <p><strong>Category:</strong> {{ book.category }}</p>
+            @if (book.publisher) {
+              <p><strong>Publisher:</strong> {{ book.publisher }}</p>
+            }
+            @if (book.publication_year) {
+              <p><strong>Year:</strong> {{ book.publication_year }}</p>
+            }
+            @if (book.description) {
+              <p class="description">{{ book.description }}</p>
+            }
+          </div>
+
+          <div class="book-footer">
+            <span class="copies-info">
+              {{ book.available_copies }} / {{ book.total_copies }} available
+            </span>
+            <button (click)="editBook(book.id)" class="btn-edit">
+              ✏️ Edit
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
