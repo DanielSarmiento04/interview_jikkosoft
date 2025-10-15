@@ -133,7 +133,51 @@ npm run build
 npm test
 ```
 
-## 🛣️ Rutas
+## � Despliegue con Docker
+
+### Construir Imagen Docker
+
+```bash
+docker build -t library-frontend:latest .
+```
+
+### Ejecutar Contenedor
+
+```bash
+docker run -d -p 8080:80 --name library-frontend library-frontend:latest
+```
+
+Acceder a la aplicación en `http://localhost:8080`
+
+### Usando Docker Compose
+
+```bash
+# Iniciar la aplicación
+docker-compose up -d
+
+# Ver logs
+docker-compose logs -f
+
+# Detener la aplicación
+docker-compose down
+```
+
+### Despliegue en Producción
+
+El Dockerfile usa construcción multi-etapa:
+- **Etapa 1**: Node.js 20 Alpine construye la aplicación Angular
+- **Etapa 2**: Nginx 1.27 Alpine sirve archivos estáticos
+
+Características:
+- ✅ Compilación optimizada para producción
+- ✅ Compresión gzip habilitada
+- ✅ Encabezados de seguridad configurados
+- ✅ Caché de assets estáticos (1 año)
+- ✅ Soporte de enrutamiento Angular (SPA)
+- ✅ Endpoint de health check `/health`
+- ✅ Imagen pequeña (~50MB)
+
+## �🛣️ Rutas
 
 | Ruta | Componente | Descripción |
 |------|-----------|-------------|

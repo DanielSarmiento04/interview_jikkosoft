@@ -2,7 +2,6 @@
 
 services:
 
-
   db:
     container_name: db
     image: postgres:18
@@ -16,7 +15,24 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    container_name: library-frontend
+    ports:
+      - "4200:80"
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    networks:
+      - library-network
 
 volumes:
   db_data:
     driver: local
+
+
+networks:
+  library-network:
+    driver: bridge

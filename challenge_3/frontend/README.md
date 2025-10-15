@@ -133,7 +133,51 @@ npm run build
 npm test
 ```
 
-## 🛣️ Routes
+## � Docker Deployment
+
+### Build Docker Image
+
+```bash
+docker build -t library-frontend:latest .
+```
+
+### Run Container
+
+```bash
+docker run -d -p 8080:80 --name library-frontend library-frontend:latest
+```
+
+Access the application at `http://localhost:8080`
+
+### Using Docker Compose
+
+```bash
+# Start the application
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the application
+docker-compose down
+```
+
+### Production Deployment
+
+The Dockerfile uses a multi-stage build:
+- **Stage 1**: Node.js 20 Alpine builds the Angular app
+- **Stage 2**: Nginx 1.27 Alpine serves static files
+
+Features:
+- ✅ Optimized production build
+- ✅ Gzip compression enabled
+- ✅ Security headers configured
+- ✅ Static asset caching (1 year)
+- ✅ Angular routing support (SPA)
+- ✅ Health check endpoint `/health`
+- ✅ Small image size (~50MB)
+
+## �🛣️ Routes
 
 | Path | Component | Description |
 |------|-----------|-------------|

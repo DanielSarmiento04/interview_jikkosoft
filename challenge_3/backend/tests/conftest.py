@@ -2,10 +2,15 @@
 Test configuration and fixtures.
 """
 
+import os
 import pytest
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
 from fastapi.testclient import TestClient
+
+# Set test environment variable before importing app
+# Using same PostgreSQL connection as env.example.sh
+os.environ["PG_CONNECTION_STRING"] = "postgresql://user:password@localhost:5432/library"
 
 from app import app
 from app.database import get_session
