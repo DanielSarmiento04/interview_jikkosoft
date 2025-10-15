@@ -479,15 +479,6 @@ docker compose logs -f
 This project is part of a technical interview for Jikkosoft.  
 © 2025 Daniel Sarmiento. All rights reserved.
 
----
 
-## 🙏 Acknowledgments
-
-This technical interview showcases:
-- Modern software engineering best practices
-- Production-ready code quality
-- Comprehensive testing strategies
-- Professional documentation standards
-- Full-stack development expertise
 
 **Thank you for reviewing this submission!** 🚀
